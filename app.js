@@ -6,33 +6,39 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const cors = require('cors');
+//const cors = require('cors');
 require('dotenv').config();
 
 const authRouter = require('./routes/auth.router');
-
+const playerRouter = require('./routes/player.router')
+//const teamRouter = require('./routes/team.router')
 
 // MONGOOSE CONNECTION
 mongoose
-  .connect(process.env.MONGODB_URI, {
-    keepAlive: true,
+  .connect(`${process.env.MONGODB_URI}`, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
-  .then(() => console.log(`Connected to database`))
-  .catch((err) => console.error(err));
+  .then(x => {
+    console.log(
+      `Connected to Mongo! Database "${x.connections[0].name}"`
+    );
+  })
+  .catch(err => {
+    console.error("Error connecting to mongo", err);
+  });
 
 
 // EXPRESS SERVER INSTANCE
 const app = express();
 
 // CORS MIDDLEWARE SETUP
-app.use(
+/*app.use(
   cors({
     credentials: true,
     origin: [process.env.PUBLIC_DOMAIN],
   }),
-);
+); */
 
 
 // SESSION MIDDLEWARE
@@ -60,6 +66,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTER MIDDLEWARE
 app.use('/auth', authRouter);
+app.use('/api/players', playerRouter);
+//app.use('/api/team', teamRouter);
 
 
 

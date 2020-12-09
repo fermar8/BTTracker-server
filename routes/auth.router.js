@@ -3,7 +3,7 @@ const router = express.Router();
 const createError = require("http-errors");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const User = require("../models/user.model");
+const Coach = require('./../models/coach.model');
 
 // HELPER FUNCTIONS
 const {
@@ -14,9 +14,9 @@ const {
 
 // POST '/auth/signup'
 router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, team, email, password } = req.body;
 
-  User.findOne({ username })
+  Coach.findOne({ username })
     .then( (foundUser) => {
 
       if (foundUser) {
@@ -24,11 +24,11 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
         return next( createError(400) ); // Bad Request
       }
       else {
-        // If username is available, go and create a new user
+        // If username is available, go and create a new coach
         const salt = bcrypt.genSaltSync(saltRounds);
         const encryptedPassword = bcrypt.hashSync(password, salt);
 
-        User.create( { username, password: encryptedPassword })
+        Coach.create( { username, team, email, password: encryptedPassword })
           .then( (createdUser) => {
             // set the `req.session.currentUser` using newly created user object, to trigger creation of the session and cookie
             createdUser.password = "*";
@@ -58,10 +58,10 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
 router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
   const { username, password } = req.body;
 
-  User.findOne({ username })
+  Coach.findOne({ username })
     .then( (user) => {
       if (! user) {
-        // If user with that username can't be found, respond with an error
+        // If coach with that username can't be found, respond with an error
         return next( createError(404)  );  // Not Found
       }
 
