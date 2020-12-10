@@ -8,7 +8,9 @@ const TrainingPerformance = require('../models/training.performance')
 const Player = require('../models/player.model');
 
 
-// POST '/api/training' //when pushing trainingPerformance it's pushing to first training that matches date.
+// POST '/api/training' // when creating training it's not updating stats array + when creating again it's pushing perfId multiple times
+// when pushing trainingPerformance it's pushing to first training that matches date. //gives 400
+
 router.post('/training', async (req, res, next) => {
   const { _id } = req.session.currentUser;
   var dateObj = new Date();
@@ -42,12 +44,12 @@ try{
     stats:[]
 })
 let performances = await TrainingPerformance.find({"date" : { $in : [dateDay]}})
-let updateTraining = [];
-performances.map(singlePerf => {
+
+let updateTraining = performances.map(singlePerf => {
   Training.findOneAndUpdate({"date" : { $in : [dateDay]}}, 
-  {$push: {stats: singlePerf._id}})
+  {$push: {stats: singlePerf._id}}, {new:true})
    .then(response => console.log('response', response))
-   updateTraining.push(singlePerf._id)
+
 })
 
   res.status(200).json(response);
@@ -81,16 +83,25 @@ router.get('/training/:id', (req, res, next) =>  {
 
 //PUT /api/training/:id
 
-router.put('/training/:id', (req, res, next ) => {
+router.put('/training/:id', async (req, res, next ) => {  //how to update training + trainingPerformance? Populate?
   const { id } = req.params;
-  const {name, number, image, email} = req.body;
+  const {
+    attendance,
+    coachComments,                               
+    ftAttempted,
+    ftConverted,
+    twoPAttempted,
+    twoPConverted,
+    threePAttempted,
+    threePConverted} = req.body
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(400).json({ message: 'Specified id is not valid' });
     return;
   }
 
-  Player.findByIdAndUpdate(id, {name, number, image, email})
+  TrainingPerformance.findByIdAndUpdate(id,
+    {attendance, coachComments, ftAttempted, ftConverted, twoPAttempted, twoPConverted, threePAttempted, threePConverted})
     .then(() => {
       res.status(200).send();
     })
@@ -102,7 +113,7 @@ router.put('/training/:id', (req, res, next ) => {
 
 //DELETE api/training/:id
 
-router.delete('/players/:id', (req, res, next) => {
+router.delete('/training/:id', (req, res, next) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -110,7 +121,7 @@ router.delete('/players/:id', (req, res, next) => {
     return;
   }
 
-  Player.findByIdAndRemove(id)
+  Training.findByIdAndRemove(id)
   .then(() => {
     res
       .status(202)  //  Accepted

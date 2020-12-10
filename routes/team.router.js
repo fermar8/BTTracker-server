@@ -35,9 +35,8 @@ router.get('/team/stats', (req, res, next) => {
         return;
       }
 
-    Coach.findById(_id)
-         .populate('players')
-         .populate('trainings') //HOW to get STATS?
+    Training.find()
+         .populate('stats')
          .then( (teamStats) => {
             res.status(200).json(teamStats);  // OK
           })
