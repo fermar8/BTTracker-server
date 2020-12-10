@@ -7,19 +7,8 @@ const Training = require('../models/training.model');
 const TrainingPerformance = require('../models/training.performance')
 const Player = require('../models/player.model');
 
-//get list of players -- only need id's
-//map over the list of players and create new empty performance for each player 
-// when mapping we need to return a promise
 
-// const performancePromises = playersIdsArr.map(( playerId) => {
-//  const pr = TrainingPerformance.create({ player: playerId ,.... })
-//  return pr;
-// })
-// Promise.all(performancePromises)
-//    .then((createdPerformances))
-
-//add created performances to stats array
-// POST '/api/training'
+// POST '/api/training' //when pushing trainingPerformance it's pushing to first training that matches date.
 router.post('/training', async (req, res, next) => {
   const { _id } = req.session.currentUser;
   var dateObj = new Date();
@@ -52,86 +41,24 @@ try{
     notes: "",
     stats:[]
 })
-trainingMapCreate.map(singlePerf => {
-  Training.findOneAndUpdate(dateDay, 
-    {$push: {stats: singlePerf._id}}, {new: true})
-
+let performances = await TrainingPerformance.find({"date" : { $in : [dateDay]}})
+let updateTraining = [];
+performances.map(singlePerf => {
+  Training.findOneAndUpdate({"date" : { $in : [dateDay]}}, 
+  {$push: {stats: singlePerf._id}})
+   .then(response => console.log('response', response))
+   updateTraining.push(singlePerf._id)
 })
-  
-  res.status(200).json(performanceFind);
+
+  res.status(200).json(response);
   } catch(err){
     res.status(400).send(err)
   }
-  })
-      //Promise.all(performancePromises)
-        /*.then((createdPerformances) => {
-          const {date, exercises, notes, coach} = req.body
-          const {_id} = req.session.currentUser
-          Training.create({date, exercises, notes, coach: _id})
-            .then((createdTraining) =>{
-              const {_id } = req.session.currentUser
-              Coach.findByIdAndUpdate(_id, {$push: {trainings: createdTraining._id}}, {new:true})
-                .then((createdCoach))
-                res
-                .status(201)
-                .json(createdCoach)
-            })
-            .catch((err)=> {
-              res
-                .status(500)  // Internal Server Error
-                .json(err)
-        })        
-    })
-    .catch((err)=> {
-      res
-        .status(500)  // Internal Server Error
-        .json(err)  
-  })
-  .catch((err)=> {
-    res
-      .status(500)  // Internal Server Error
-      .json(err)
-     })
-
-   })*/
-   /*.catch((err)=> {
-    res
-      .status(500)  // Internal Server Error
-      .json(err)
-
-   })
-  //})*/
-
-//get list of players -- only need id's
-//map over the list of players and create new empty performance for each player 
-// when mapping we need to return a promise
-
-// const performancePromises = playersIdsArr.map(( playerId) => {
-//  const pr = TrainingPerformance.create({ player: playerId ,.... })
-//  return pr;
-// })
-// Promise.all(performancePromises)
-//    .then((createdPerformances))
-
-//add created performances to stats array
-  /*Training.create({ date, exercises, notes, stats: [], coach})
-    .then((createdTraining)=> {
-      const { id } = req.session.currentUser;
-      Coach.findOneAndUpdate(id, {$push: {trainings: createdTraining._id}}, {new:true})
-      res
-        .status(201)
-        .json(createdTraining);
-    })
-    .catch((err)=> {
-      res
-        .status(500)  // Internal Server Error
-        .json(err)
-    })
 })
-*/
+     
 // GET '/api/training/:id'
 
-router.get('/players', (req, res, next) =>  {
+router.get('/training/:id', (req, res, next) =>  {
   const { id } = req.params;
   
   if ( !mongoose.Types.ObjectId.isValid(id)) {
@@ -141,9 +68,10 @@ router.get('/players', (req, res, next) =>  {
     return;
   }
 
-  Player.findById(id)
-        .then( (foundPlayer) => {
-          res.status(200).json(foundPlayer); //OK
+  Training.findById(id)
+        .populate('stats')  //need to populate player too
+        .then( (foundTraining) => {
+          res.status(200).json(foundTraining); //OK
         })
         .catch((err) => {
           res.status(500).json(err);
@@ -153,7 +81,7 @@ router.get('/players', (req, res, next) =>  {
 
 //PUT /api/training/:id
 
-router.put('/players/:id', (req, res, next ) => {
+router.put('/training/:id', (req, res, next ) => {
   const { id } = req.params;
   const {name, number, image, email} = req.body;
 
