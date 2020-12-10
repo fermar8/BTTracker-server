@@ -11,7 +11,8 @@ require('dotenv').config();
 
 const authRouter = require('./routes/auth.router');
 const playerRouter = require('./routes/player.router')
-//const teamRouter = require('./routes/team.router')
+const teamRouter = require('./routes/team.router')
+const trainingRouter = require('./routes/training.router')
 
 // MONGOOSE CONNECTION
 mongoose
@@ -40,13 +41,13 @@ app.use(
   }),
 );
 
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST OPTIONS, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.setHeader('Access-Control-Allow-Credentials', true);
   next();
-});
+});*/
 
 // SESSION MIDDLEWARE
 app.use(
@@ -73,8 +74,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTER MIDDLEWARE
 app.use('/auth', authRouter);
-app.use('/api/players', playerRouter);
-//app.use('/api/team', teamRouter);
+app.use('/api', playerRouter);
+app.use('/api', teamRouter);
+app.use('/api', trainingRouter);
 
 
 

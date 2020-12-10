@@ -2,32 +2,49 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Player = require('../models/player.model');
 const router  = express.Router();
-
+const {isLoggedIn} = require("../helpers/middlewares");
 const Coach = require('../models/coach.model');
 const Training = require('../models/training.model');
 const TrainingPerformance = require('../models/training.performance');
 
 
-// POST '/api/players'
-router.post('/', (req, res, next) => {
-  const { name, number, image, email} = req.body;
+//POST - Can't set team to coachId and push coachId to players array (managed but deleted)
+//DELETE - When I managed to delete it only deleted player but not objectId from coach players array
 
-  Player.create({ name, number, image, email })
-    .then((createdProject)=> {
-      res
-        .status(201)
-        .json(createdProject);
-    })
-    .catch((err)=> {
-      res
-        .status(500)  // Internal Server Error
-        .json(err)
+// POST '/api/players' 
+router.post('/players', (req, res, next) => {
+  const { name, number, image, email, team} = req.body;
+
+  Player.create({
+    name: name,
+    number: number,  
+    image: image,
+    email: email,
+    team: team
+})
+  .then((newPlayer) => {
+
+    Coach.findByIdAndUpdate( 
+      team, 
+      { $push: { players: newPlayer._id } }
+    )
+      .then((updatedCoach) => {
+        res.status(201).json(updatedCoach);
+      })
+      .catch(err => {
+        res.status(500).json(err);
     })
 })
+.catch(err => {
+  res.status(500).json(err);
+})
+})
+    
+
 
 // GET '/api/players/:id'
 
-router.get('/players', (req, res, next) =>  {
+router.get('/players/:id', (req, res, next) =>  {
   const { id } = req.params;
   
   if ( !mongoose.Types.ObjectId.isValid(id)) {
@@ -70,20 +87,27 @@ router.put('/players/:id', (req, res, next ) => {
 
 //DELETE api/players/:id
 
-router.delete('/players/:id', (req, res, next) => {
-  const { id } = req.params;
+router.delete('/players/:id', isLoggedIn, (req, res, next) => {
+  const playerId  = req.params.id;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     res.status(400).json({ message: 'Specified id is not valid' });
     return;
   }
 
-  Player.findByIdAndRemove(id)
-  .then(() => {
+ Player.findByIdAndRemove(playerId)
+    .then(() => {
+  const { _id } = req.session.currentUser
+  Coach.findByIdAndUpdate(_id, {$pull: {players: playerId}})
+    .then(() => {
     res
-      .status(202)  //  Accepted
-      .send(`Document ${id} was removed successfully.`);
+    .status(202)  //  Accepted
+    .send(`Document ${playerId} was removed successfully.`);
   })
+  .catch( err => {
+    res.status(500).json(err);
+  })
+})
   .catch( err => {
     res.status(500).json(err);
   })
