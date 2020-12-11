@@ -6,8 +6,7 @@ const Schema = mongoose.Schema;
 const coachSchema = new Schema ({
   username: {type: String, unique: true},
   team: {type: String, unique: true},
-  teamImage: String,
-  coachImage: String,
+  teamLogo: String,
   email: String,
   password: String,
   players: [{type: Schema.Types.ObjectId, ref: "Player"}],

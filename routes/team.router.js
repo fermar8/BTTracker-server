@@ -12,9 +12,8 @@ const Player = require('../models/player.model');
 
 //GET /api/team/
 
-router.get('/team', (req, res, next) => {
-  const { _id } = req.session.currentUser;
-
+router.get('/', (req, res, next) => {
+  const  {_id}  = req.session.currentUser;
     Coach.findById(_id)
          .populate('players')
          .then( (foundTeam) => {
@@ -28,7 +27,7 @@ router.get('/team', (req, res, next) => {
 
 //GET /api/team/stats
 
-router.get('/team/stats', (req, res, next) => {
+router.get('/stats', (req, res, next) => {
     const { _id } = req.session.currentUser;
 
     if ( !mongoose.Types.ObjectId.isValid(_id)) {

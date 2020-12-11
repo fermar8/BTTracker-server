@@ -76,8 +76,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTER MIDDLEWARE
 app.use('/auth', authRouter);
-app.use('/api', playerRouter);
-app.use('/api', teamRouter);
+app.use('/api/players', playerRouter);
+app.use('/api/team', teamRouter);
 app.use('/api', trainingRouter);
 app.use('/api', performanceRouter);
 

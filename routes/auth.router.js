@@ -5,12 +5,15 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const Coach = require('./../models/coach.model');
 
+//Cloudinary
+
 // HELPER FUNCTIONS
 const {
   isLoggedIn,
   isNotLoggedIn,
   validationLogin
 } = require("../helpers/middlewares");
+
 
 // POST '/auth/signup'
 router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
@@ -50,8 +53,6 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
 
 
 })
-
-
 
 
 // POST '/auth/login'

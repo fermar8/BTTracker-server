@@ -4,13 +4,10 @@ const Player = require('../models/player.model');
 const router  = express.Router();
 const {isLoggedIn} = require("../helpers/middlewares");
 const Coach = require('../models/coach.model');
-const Training = require('../models/training.model');
-const TrainingPerformance = require('../models/training.performance');
-
 
 
 // POST '/api/players' 
-router.post('/players', (req, res, next) => {
+router.post('/', (req, res, next) => {
   const { name, number, image, email, team} = req.body;
 
   Player.create({
@@ -42,7 +39,7 @@ router.post('/players', (req, res, next) => {
 
 // GET '/api/players/:id'
 
-router.get('/players/:id', (req, res, next) =>  {
+router.get('/:id', (req, res, next) =>  {
   const { id } = req.params;
   
   if ( !mongoose.Types.ObjectId.isValid(id)) {
@@ -64,7 +61,7 @@ router.get('/players/:id', (req, res, next) =>  {
 
 //PUT /api/players/:id
 
-router.put('/players/:id', (req, res, next ) => {
+router.put('/:id', (req, res, next ) => {
   const { id } = req.params;
   const {name, number, image, email} = req.body;
 
@@ -85,7 +82,7 @@ router.put('/players/:id', (req, res, next ) => {
 
 //DELETE api/players/:id
 
-router.delete('/players/:id', isLoggedIn, (req, res, next) => {
+router.delete('/:id', isLoggedIn, (req, res, next) => {
   const playerId  = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
