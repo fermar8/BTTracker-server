@@ -13,7 +13,7 @@ const Player = require('../models/player.model');
 
 //PUT how to update training + trainingPerformance? 
 
-router.post('/training', (req, res, next) => {
+router.post('/training', async (req, res, next) => {
   const { _id } = req.session.currentUser;
   var dateObj = new Date();
   let month = dateObj.getUTCMonth() + 1;
@@ -22,55 +22,48 @@ router.post('/training', (req, res, next) => {
   
   const dateDay = year + "/" + month + "/" + day;
 
- 
-  // Create coach and then
-  Coach.findById(_id)
-    .then(coachFind => {
-      // Create an array of promises `performancePrs`
-      let performancePrs = coachFind.players.map(playersId => {
-        return TrainingPerformance.create({
-         date: dateDay,
-         player: playersId,
-         attendance: true,
-         coachComments: "",                                 
-         ftAttempted: 0,
-         ftConverted: 0,
-         twoPAttempted: 0,
-         twoPConverted: 0,
-         threePAttempted: 0,
-         threePConverted: 0
-       })
-     })
-
-      // wrap TrainigPerformance.create promises in one big promise and pass it to next block once done
-      const bigPr = Promise.all(performancePrs);
-      return bigPr;
-
-    })
-    .then((createdPerformances) => {
-      // Create array containing only ids, out of `createdPerformances`
-      const performanceIds = createdPerformances.map(performance => {
-        return performance._id
-      })
-
-      const pr = Training.create({
-        coach: _id,
-        date: dateDay,
-        exercises: "",
-        notes: "",
-        stats: [ ...performanceIds ]
-      })
-
-      return pr;
-
-    })
-    .then((createdTraining) => {
-      res.status(200).json(createdTraining);
-    })
-    .catch((err)=>  next(err) )
+  try{
   
-  
+    // Create promise to find coach and await for it
+    let coachFind = await Coach.findById(_id);
+    // Create an array of promises `performancePrs`
+    let performancePrs = coachFind.players.map(playersId => {
+    return TrainingPerformance.create({
+      date: dateDay,
+      player: playersId,
+      attendance: true,
+      coachComments: "",                                 
+      ftAttempted: 0,
+      ftConverted: 0,
+      twoPAttempted: 0,
+      twoPConverted: 0,
+      threePAttempted: 0,
+      threePConverted: 0
+    })
+  })
 
+    // await for the pending TrainigPerformance.create promises to be done, and save the created performances in array `createdPerformances`
+    const createdPerformances = await Promise.all(performancePrs);
+
+    // Create array containing only ids, out of `createdPerformances`
+    const performanceIds = createdPerformances.map(performance => {
+      return performance._id
+    })
+
+    const createdTraining = await Training.create({
+      coach: _id,
+      date: dateDay,
+      exercises: "",
+      notes: "",
+      stats: [ ...performanceIds ]
+    })
+      
+
+    res.status(200).json(response);
+  } 
+  catch(err){
+    res.status(400).send(err)
+  }
 })
      
 // GET '/api/training/:id'
@@ -100,7 +93,7 @@ router.get('/training/:id', (req, res, next) =>  {
 
 //PUT /api/training/:id
 
-router.put('/training/:id', (req, res, next ) => {  
+router.put('/training/:id', async (req, res, next ) => {  
   const { id } = req.params;
   const {
     exercises, notes} = req.body
@@ -142,4 +135,4 @@ router.delete('/training/:id', (req, res, next) => {
   })
 });
 
-module.exports = router;
+//module.exports = router;

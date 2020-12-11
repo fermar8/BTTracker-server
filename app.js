@@ -13,6 +13,7 @@ const authRouter = require('./routes/auth.router');
 const playerRouter = require('./routes/player.router')
 const teamRouter = require('./routes/team.router')
 const trainingRouter = require('./routes/training.router')
+const performanceRouter = require ('./routes/performance.router')
 
 // MONGOOSE CONNECTION
 mongoose
@@ -78,6 +79,7 @@ app.use('/auth', authRouter);
 app.use('/api', playerRouter);
 app.use('/api', teamRouter);
 app.use('/api', trainingRouter);
+app.use('/api', performanceRouter);
 
 
 
