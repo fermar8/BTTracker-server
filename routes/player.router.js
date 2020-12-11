@@ -8,8 +8,6 @@ const Training = require('../models/training.model');
 const TrainingPerformance = require('../models/training.performance');
 
 
-//POST - Can't set team to coachId and push coachId to players array (managed but deleted)
-//DELETE - When I managed to delete it only deleted player but not objectId from coach players array
 
 // POST '/api/players' 
 router.post('/players', (req, res, next) => {

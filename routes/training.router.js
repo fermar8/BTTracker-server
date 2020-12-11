@@ -8,8 +8,10 @@ const TrainingPerformance = require('../models/training.performance')
 const Player = require('../models/player.model');
 
 
-// POST '/api/training' // when creating training it's not updating stats array + when creating again it's pushing perfId multiple times
+// POST '/api/training' // when first creating training it's not updating stats array + when creating again it's pushing perfId multiple times
 // when pushing trainingPerformance it's pushing to first training that matches date. //gives 400
+
+//PUT how to update training + trainingPerformance? 
 
 router.post('/training', async (req, res, next) => {
   const { _id } = req.session.currentUser;
@@ -21,6 +23,7 @@ router.post('/training', async (req, res, next) => {
   const dateDay = year + "/" + month + "/" + day;
 
 try{
+ 
   let coachFind = await Coach.findById(_id);
   let trainingMapCreate = coachFind.players.map(playersId => {
    TrainingPerformance.create({
@@ -36,13 +39,14 @@ try{
     threePConverted: 0
 })
 })
-  Training.create({
-    coach: _id,
-    date: dateDay,
-    exercises: "",
-    notes: "",
-    stats:[]
+Training.create({
+  coach: _id,
+  date: dateDay,
+  exercises: "",
+  notes: "",
+  stats:[]
 })
+  
 let performances = await TrainingPerformance.find({"date" : { $in : [dateDay]}})
 
 let updateTraining = performances.map(singlePerf => {
@@ -71,7 +75,9 @@ router.get('/training/:id', (req, res, next) =>  {
   }
 
   Training.findById(id)
-        .populate('stats')  //need to populate player too
+        .populate('stats')
+        .populate({ path: 'stats', populate: 'player'})
+
         .then( (foundTraining) => {
           res.status(200).json(foundTraining); //OK
         })
@@ -83,7 +89,7 @@ router.get('/training/:id', (req, res, next) =>  {
 
 //PUT /api/training/:id
 
-router.put('/training/:id', async (req, res, next ) => {  //how to update training + trainingPerformance? Populate?
+router.put('/training/:id', async (req, res, next ) => {  
   const { id } = req.params;
   const {
     attendance,

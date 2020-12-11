@@ -7,6 +7,9 @@ const Training = require('../models/training.model');
 const TrainingPerformance = require('../models/training.performance')
 const Player = require('../models/player.model');
 
+
+
+
 //GET /api/team/
 
 router.get('/team', (req, res, next) => {
@@ -37,6 +40,7 @@ router.get('/team/stats', (req, res, next) => {
 
     Training.find()
          .populate('stats')
+         .populate({ path: 'stats', populate: 'player'})
          .then( (teamStats) => {
             res.status(200).json(teamStats);  // OK
           })
