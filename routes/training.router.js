@@ -11,9 +11,14 @@ const Player = require('../models/player.model');
 
 // POST '/api/training'
 
-router.post('/', isLoggedIn, (req, res, next) => {
+router.post('/', (req, res, next) => {
   const { _id } = req.session.currentUser;
   const dateDay = new Date().toLocaleDateString();
+  let Month = training.date.slice(0, 2);
+  let Day = training.date.slice (3, 5);
+  let Year = training.date.slice (6, 9);
+
+  dateDay = `${Day}${Month}${Year}`;
 
  
   // Create coach and then
