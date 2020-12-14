@@ -78,8 +78,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/auth', authRouter);
 app.use('/api/players', playerRouter);
 app.use('/api/team', teamRouter);
-app.use('/api', trainingRouter);
-app.use('/api', performanceRouter);
+app.use('/api/training', trainingRouter);
+app.use('/api/performance', performanceRouter);
 
 
 

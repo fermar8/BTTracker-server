@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router  = express.Router();
+const {isLoggedIn} = require("../helpers/middlewares");
 
 const Coach = require('../models/coach.model');
 const Training = require('../models/training.model');
@@ -12,7 +13,7 @@ const Player = require('../models/player.model');
 
 //GET /api/team/
 
-router.get('/', (req, res, next) => {
+router.get('/', isLoggedIn, (req, res, next) => {
   const  {_id}  = req.session.currentUser;
     Coach.findById(_id)
          .populate('players')
@@ -27,19 +28,19 @@ router.get('/', (req, res, next) => {
 
 //GET /api/team/stats
 
-router.get('/stats', (req, res, next) => {
-    const { _id } = req.session.currentUser;
+router.get('/stats', isLoggedIn, (req, res, next) => {
+    /*const { _id } = req.session.currentUser;
 
     if ( !mongoose.Types.ObjectId.isValid(_id)) {
         res
           .status(400)  //  Bad Request
           .json({ message: 'Specified id is not valid'})
         return;
-      }
+      }*/
 
-    Training.find()
-         .populate('stats')
-         .populate({ path: 'stats', populate: 'player'})
+      //({_id: {$in: [_id]}})   
+    TrainingPerformance.find()
+         .populate('player')
          .then( (teamStats) => {
             res.status(200).json(teamStats);  // OK
           })

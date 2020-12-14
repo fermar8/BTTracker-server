@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router  = express.Router();
+const {isLoggedIn} = require("../helpers/middlewares");
 
 const Coach = require('../models/coach.model');
 const Training = require('../models/training.model');
@@ -13,7 +14,7 @@ const Player = require('../models/player.model');
 
 //PUT how to update training + trainingPerformance? 
 
-router.post('/training', async (req, res, next) => {
+router.post('/training', isLoggedIn, async (req, res, next) => {
   const { _id } = req.session.currentUser;
   var dateObj = new Date();
   let month = dateObj.getUTCMonth() + 1;
@@ -68,7 +69,7 @@ router.post('/training', async (req, res, next) => {
      
 // GET '/api/training/:id'
 
-router.get('/training/:id', (req, res, next) =>  {
+router.get('/training/:id', isLoggedIn, (req, res, next) =>  {
   const { id } = req.params;
   
   if ( !mongoose.Types.ObjectId.isValid(id)) {

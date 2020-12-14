@@ -7,10 +7,16 @@ const Training = require('../models/training.model');
 const TrainingPerformance = require('../models/training.performance')
 const Player = require('../models/player.model');
 
+const {
+  isLoggedIn,
+  isNotLoggedIn,
+  validationLogin
+} = require("../helpers/middlewares");
+
 
 //PUT api/performance/:id
 
-router.put('/performance/:id', (req, res, next ) => {  
+router.put('/:id', isLoggedIn, (req, res, next ) => {  
     const { id } = req.params;
     const {
       attendance,

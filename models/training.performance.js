@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const trainingPerformanceSchema = new Schema ({
-    date: Date,
+    date: String,
     player: {type: mongoose.Schema.ObjectId, ref: "Player"},
     attendance: {type: Boolean},
     coachComments: {type: String},                                 

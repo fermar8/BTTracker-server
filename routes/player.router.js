@@ -7,20 +7,21 @@ const Coach = require('../models/coach.model');
 
 
 // POST '/api/players' 
-router.post('/', (req, res, next) => {
-  const { name, number, image, email, team} = req.body;
+router.post('/', isLoggedIn, (req, res, next) => {
+  const { name, number, image, email} = req.body;
+  const { _id } = req.session.currentUser;
 
   Player.create({
     name: name,
     number: number,  
     image: image,
     email: email,
-    team: team
+    team: _id
 })
   .then((newPlayer) => {
 
     Coach.findByIdAndUpdate( 
-      team, 
+      _id, 
       { $push: { players: newPlayer._id } }
     )
       .then((updatedCoach) => {
@@ -39,7 +40,7 @@ router.post('/', (req, res, next) => {
 
 // GET '/api/players/:id'
 
-router.get('/:id', (req, res, next) =>  {
+router.get('/:id', isLoggedIn, (req, res, next) =>  {
   const { id } = req.params;
   
   if ( !mongoose.Types.ObjectId.isValid(id)) {
@@ -61,7 +62,7 @@ router.get('/:id', (req, res, next) =>  {
 
 //PUT /api/players/:id
 
-router.put('/:id', (req, res, next ) => {
+router.put('/:id', isLoggedIn, (req, res, next ) => {
   const { id } = req.params;
   const {name, number, image, email} = req.body;
 
