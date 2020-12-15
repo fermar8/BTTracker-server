@@ -39,7 +39,10 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: [process.env.PUBLIC_DOMAIN],
+    origin: [process.env.PUBLIC_DOMAIN,
+    "http://basketball-training-tracker.herokuapp.com",
+    "https://basketball-training-tracker.herokuapp.com",
+    ]
   }),
 );
 
@@ -81,6 +84,12 @@ app.use('/api/team', teamRouter);
 app.use('/api/training', trainingRouter);
 app.use('/api/performance', performanceRouter);
 
+
+// ROUTE FOR SERVING REACT APP (index.html)
+app.use((req, res, next) => {
+  // If no previous routes match the request, send back the React app.
+  res.sendFile(__dirname + "/public/index.html");
+});
 
 
 // ERROR HANDLING
