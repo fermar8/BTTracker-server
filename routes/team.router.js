@@ -37,9 +37,8 @@ router.get('/stats', isLoggedIn, (req, res, next) => {
           .json({ message: 'Specified id is not valid'})
         return;
       }
-
         
-    TrainingPerformance.find({_id: {$in: [_id]}})
+    TrainingPerformance.find()
          .populate('player')
          .then( (teamStats) => {
             res.status(200).json(teamStats);  // OK
