@@ -13,7 +13,8 @@ const Player = require('../models/player.model');
 
 router.post('/', isLoggedIn, (req, res, next) => {
   const { _id } = req.session.currentUser;
-  const dateDay = new Date().toLocaleDateString();
+  const dateDay = req.body.date
+ 
 
  
   // Create coach and then

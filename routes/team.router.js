@@ -29,16 +29,15 @@ router.get('/', isLoggedIn, (req, res, next) => {
 //GET /api/team/stats
 
 router.get('/stats', isLoggedIn, (req, res, next) => {
-    /*const { _id } = req.session.currentUser;
+    const { _id } = req.session.currentUser;
 
     if ( !mongoose.Types.ObjectId.isValid(_id)) {
         res
           .status(400)  //  Bad Request
           .json({ message: 'Specified id is not valid'})
         return;
-      }*/
-
-      //({_id: {$in: [_id]}})   
+      }
+        
     TrainingPerformance.find()
          .populate('player')
          .then( (teamStats) => {
