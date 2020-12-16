@@ -24,6 +24,7 @@ router.post('/', (req, res, next) => {
       let performancePrs = coachFind.players.map(playersId => {
         return TrainingPerformance.create({
          date: dateDay,
+         coach: _id,
          player: playersId,
          attendance: true,
          coachComments: "",                                 
@@ -42,6 +43,7 @@ router.post('/', (req, res, next) => {
 
     })
     .then((createdPerformances) => {
+
       // Create array containing only ids, out of `createdPerformances`
       const performanceIds = createdPerformances.map(performance => {
         return performance._id
@@ -59,11 +61,13 @@ router.post('/', (req, res, next) => {
 
     })
     .then((createdTraining) => {
-      res.status(200).json(createdTraining);
+      Coach.findByIdAndUpdate(_id, {$push: {trainings: createdTraining}})
+      .then((updatedCoach) => {
+      res.status(200).json(updatedCoach);
     })
     .catch((err)=>  next(err) )
   
-  
+  })
 
 })
      
@@ -71,7 +75,9 @@ router.post('/', (req, res, next) => {
 //GET '/api/training
 
 router.get('/', isLoggedIn, (req, res, next) => {
-  Training.find()
+  const { _id } = req.session.currentUser;
+
+  Training.find({coach: _id})
   .then( (foundTrainings) => {
     res.status(200).json(foundTrainings);  // OK
   })

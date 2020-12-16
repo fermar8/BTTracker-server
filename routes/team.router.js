@@ -38,7 +38,7 @@ router.get('/stats', isLoggedIn, (req, res, next) => {
         return;
       }
         
-    TrainingPerformance.find()
+    TrainingPerformance.find({coach: _id})
          .populate('player')
          .then( (teamStats) => {
             res.status(200).json(teamStats);  // OK
