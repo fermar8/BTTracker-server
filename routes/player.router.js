@@ -4,6 +4,7 @@ const Player = require('../models/player.model');
 const router  = express.Router();
 const {isLoggedIn} = require("../helpers/middlewares");
 const Coach = require('../models/coach.model');
+const TrainingPerformance = require('../models/training.performance')
 
 
 // POST '/api/players' 
@@ -96,9 +97,14 @@ router.delete('/:id', isLoggedIn, (req, res, next) => {
   const { _id } = req.session.currentUser
   Coach.findByIdAndUpdate(_id, {$pull: {players: playerId}})
     .then(() => {
-    res
-    .status(202)  //  Accepted
-    .send(`Document ${playerId} was removed successfully.`);
+   TrainingPerformance.deleteMany({player: playerId})
+    .then(() => {
+      res
+      .status(202)  //  Accepted
+      .send(`Document ${playerId} was removed successfully.`);
+    })
+    .catch(err => {
+    })
   })
   .catch( err => {
     res.status(500).json(err);
