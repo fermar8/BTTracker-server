@@ -12,7 +12,8 @@ const trainingPerformanceSchema = new Schema ({
     twoPConverted: {type: Number},
     threePAttempted: {type: Number},
     threePConverted: {type: Number},
-    coach: {type: Schema.Types.ObjectId, ref: "Coach"}
+    coach: {type: Schema.Types.ObjectId, ref: "Coach"},
+    training: {type: Schema.Types.ObjectId, ref: "Training"}
     
 })     
 

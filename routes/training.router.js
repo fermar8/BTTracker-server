@@ -33,7 +33,7 @@ router.post('/', (req, res, next) => {
          twoPAttempted: 0,
          twoPConverted: 0,
          threePAttempted: 0,
-         threePConverted: 0
+         threePConverted: 0,
        })
      })
 
@@ -61,14 +61,17 @@ router.post('/', (req, res, next) => {
 
     })
     .then((createdTraining) => {
-      Coach.findByIdAndUpdate(_id, {$push: {trainings: createdTraining}})
+      const newTraining = createdTraining;
+      TrainingPerformance.updateMany({date: dateDay}, {$set: {training: newTraining._id}})
+       .then(() => {
+      Coach.findByIdAndUpdate(_id, {$push: {trainings: newTraining}})
       .then((updatedCoach) => {
       res.status(200).json(updatedCoach);
     })
     .catch((err)=>  next(err) )
-  
   })
-
+  .catch((err)=> next(err))
+ })
 })
      
 
@@ -148,6 +151,8 @@ router.delete('/:id', isLoggedIn, (req, res, next) => {
 
   Training.findByIdAndRemove(id)
   .then(() => {
+    TrainingPerformance.deleteMany({training: id})
+    .then(() => {
     res
       .status(202)  //  Accepted
       .send(`Document ${id} was removed successfully.`);
@@ -155,6 +160,11 @@ router.delete('/:id', isLoggedIn, (req, res, next) => {
   .catch( err => {
     res.status(500).json(err);
   })
-});
+  .catch( err => {
+    res.status(500).json(err);
+  });
+ })
+})
 
 module.exports = router;
+
