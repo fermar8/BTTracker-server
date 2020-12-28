@@ -21,10 +21,9 @@ router.post('/signup', isNotLoggedIn, validationLogin, (req, res, next) => {
 
   Coach.findOne({ username })
     .then( (foundUser) => {
-
       if (foundUser) {
         // If username is already taken, then return error response
-        return next( createError(400) ); // Bad Request
+        return next( createError(400, "Username already exists") ); // Bad Request
       }
       else {
         // If username is available, go and create a new coach
@@ -63,7 +62,7 @@ router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
     .then( (user) => {
       if (! user) {
         // If coach with that username can't be found, respond with an error
-        return next( createError(404)  );  // Not Found
+        return next( createError(404, "Username not found")  );  // Not Found
       }
 
       const passwordIsValid = bcrypt.compareSync(password, user.password); //  true/false
@@ -79,7 +78,7 @@ router.post('/login', isNotLoggedIn, validationLogin, (req, res, next) => {
 
       }
       else {
-        next( createError(401) ); // Unathorized
+        next( createError(401, "Incorrect password, please try again") ); // Unathorized
       }
 
     })
